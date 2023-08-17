@@ -1,5 +1,7 @@
 package com.softserve.itacademy.service.impl;
 
+import com.softserve.itacademy.exception.EntityNotFoundException;
+import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.State;
 import com.softserve.itacademy.repository.StateRepository;
 import com.softserve.itacademy.service.StateService;
@@ -19,19 +21,25 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public State create(State state) {
-            return stateRepository.save(state);
+        if(state == null || state.getName() == null || state.getName().trim().isEmpty())
+            throw new NullEntityReferenceException("Cannot create empty state object");
+        return stateRepository.save(state);
     }
 
     @Override
     public State readById(long id) {
         Optional<State> optional = stateRepository.findById(id);
-            return optional.get();
+        if(optional.isEmpty())
+            throw new EntityNotFoundException("User with id: " + id + " does not exist");
+        return optional.get();
     }
 
     @Override
     public State update(State state) {
-            State oldState = readById(state.getId());
-                return stateRepository.save(state);
+        if(state == null)
+            throw new NullEntityReferenceException("Cannot create empty state object");
+        State oldState = readById(state.getId());
+        return stateRepository.save(state);
     }
 
     @Override
