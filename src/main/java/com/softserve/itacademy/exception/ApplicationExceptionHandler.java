@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -63,10 +64,10 @@ public class ApplicationExceptionHandler {
         return "404";
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
-    public ModelAndView handleServerErrorException (Exception  e, HttpServletResponse response) {
-        ModelAndView modelAndView = new ModelAndView("500");
+    @ExceptionHandler(ResponseStatusException.class)
+
+    public ModelAndView handleServerErrorException (ResponseStatusException e, HttpServletResponse response) {
+        ModelAndView modelAndView = new ModelAndView("500", HttpStatus.INTERNAL_SERVER_ERROR);
         modelAndView.addObject("title", "Server Error");
         modelAndView.addObject("message", e.getMessage());
         modelAndView.addObject("localDateTime", LocalDateTime.now());
