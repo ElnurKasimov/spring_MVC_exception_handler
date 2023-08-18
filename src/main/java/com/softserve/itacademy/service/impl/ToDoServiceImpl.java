@@ -31,7 +31,7 @@ public class ToDoServiceImpl implements ToDoService {
     public ToDo readById(long id) {
         Optional<ToDo> optional = todoRepository.findById(id);
         if(optional.isEmpty())
-            throw new EntityNotFoundException("Todo with id: " + id + " does not exist");
+            throw new EntityNotFoundException("Todo with id " + id + " does not exist");
         return optional.get();
     }
 
