@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -55,9 +57,9 @@ public class ApplicationExceptionHandler {
         return modelAndView;
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(value= HttpStatus.NOT_FOUND)
-    public ModelAndView handleNotFoundException (Exception  e) {
+    public ModelAndView handleNotFoundException (NoHandlerFoundException  e) {
         return new ModelAndView("404");
     }
 
