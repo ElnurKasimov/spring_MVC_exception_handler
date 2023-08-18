@@ -14,12 +14,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.server.ServerErrorException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest
+@WebMvcTest(ApplicationExceptionHandler.class)
 class ApplicationExceptionHandlerTest {
+    private ApplicationExceptionHandler myHandler;
     @Getter
     @Autowired
     private MockMvc mockMvc;
@@ -38,10 +41,22 @@ class ApplicationExceptionHandlerTest {
     @Test
     @DisplayName("Test that 404 exception is handled")
     public void handle404Test () throws Exception {
-
+        //given
+        myHandler = new ApplicationExceptionHandler();
+        NoHandlerFoundException e = new NoHandlerFoundException("GET", "/home/any", null);
+        //when
+        String actual = myHandler.handleNotFoundException(e);
+        //then
+        assertEquals("404", actual);
         mockMvc.perform(MockMvcRequestBuilders.get("/home/any"))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
-                //      .andExpect(MockMvcResultMatchers.view().name("404"));
-
     }
+
+    @Test
+    @DisplayName("Test that 500 exception is handled")
+    public void handle500Test () throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/simulate-error"))
+                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+    }
+
 }

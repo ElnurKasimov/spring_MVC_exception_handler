@@ -59,14 +59,30 @@ public class ApplicationExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(value= HttpStatus.NOT_FOUND)
-    public ModelAndView handleNotFoundException (NoHandlerFoundException  e) {
-        return new ModelAndView("404");
+    public String handleNotFoundException (NoHandlerFoundException  e) {
+        return "404";
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
-    public ModelAndView handleServerErrorException (Exception  e) {
-        return new ModelAndView("500");
+    public ModelAndView handleServerErrorException (Exception  e, HttpServletResponse response) {
+        ModelAndView modelAndView = new ModelAndView("500");
+        modelAndView.addObject("title", "Server Error");
+        modelAndView.addObject("message", e.getMessage());
+        modelAndView.addObject("localDateTime", LocalDateTime.now());
+        modelAndView.addObject("status", response.getStatus());
+        modelAndView.addObject("type", e.getClass().getName());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        String debugPropertyValue = System.getProperty("debug");
+        String debugEnvValue = System.getenv("DEBUG");
+        if( (debugPropertyValue != null && debugPropertyValue.equals("true")) ||
+                (debugEnvValue != null && debugEnvValue.equals("true")) ) {
+            modelAndView.addObject("stackTrace", stackTrace);
+        }
+        return modelAndView;
     }
 
 }
