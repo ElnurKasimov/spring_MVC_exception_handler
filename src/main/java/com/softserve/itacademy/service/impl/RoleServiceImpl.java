@@ -1,5 +1,7 @@
 package com.softserve.itacademy.service.impl;
 
+import com.softserve.itacademy.exception.EntityNotFoundException;
+import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.Role;
 import com.softserve.itacademy.repository.RoleRepository;
 import com.softserve.itacademy.service.RoleService;
@@ -20,19 +22,25 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role create(Role role) {
-            return roleRepository.save(role);
+        if(role == null || role.getName() == null || role.getName().trim().isEmpty())
+            throw new NullEntityReferenceException("Cannot create empty state object");
+        return roleRepository.save(role);
     }
 
     @Override
     public Role readById(long id) {
         Optional<Role> optional = roleRepository.findById(id);
-            return optional.get();
+        if(optional.isEmpty())
+            throw new EntityNotFoundException("Task with id: " + id + " does not exist");
+        return optional.get();
     }
 
     @Override
     public Role update(Role role) {
-            Role oldRole = readById(role.getId());
-                return roleRepository.save(role);
+        if(role == null)
+            throw new NullEntityReferenceException("Cannot update empty state object");
+        Role oldRole = readById(role.getId());
+        return roleRepository.save(role);
     }
 
     @Override
