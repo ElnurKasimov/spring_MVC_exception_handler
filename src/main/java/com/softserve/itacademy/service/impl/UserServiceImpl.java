@@ -5,7 +5,9 @@ import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.User;
 import com.softserve.itacademy.repository.UserRepository;
 import com.softserve.itacademy.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +24,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        if(user == null || user.getEmail() == null || user.getEmail().trim().isEmpty() || userRepository.getUserByEmail(user.getEmail()) == null)
+        if(user == null)
+//                || user.getEmail() == null || user.getEmail().trim().isEmpty() || userRepository.getUserByEmail(user.getEmail()) != null)
             throw new NullEntityReferenceException("Cannot create empty user object");
-        return userRepository.save(user);
+        try{
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -38,15 +45,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         if(user == null)
-            throw new NullEntityReferenceException("Cannot create empty user object");
+            throw new NullEntityReferenceException("Cannot update empty user object");
         User oldUser = readById(user.getId());
+        try{
         return userRepository.save(user);
+         } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public void delete(long id) {
-        User user = readById(id);
-            userRepository.delete(user);
+        Optional<User> optional = userRepository.findById(id);
+        if(optional.isEmpty())
+            throw new EntityNotFoundException("User with id: " + id + " does not exist");
+            userRepository.delete(optional.get());
     }
 
     @Override

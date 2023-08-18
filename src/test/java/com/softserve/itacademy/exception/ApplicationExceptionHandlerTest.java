@@ -41,15 +41,9 @@ class ApplicationExceptionHandlerTest {
     @Test
     @DisplayName("Test that 404 exception is handled")
     public void handle404Test () throws Exception {
-        //given
-        myHandler = new ApplicationExceptionHandler();
-        NoHandlerFoundException e = new NoHandlerFoundException("GET", "/home/any", null);
-        //when
-        String actual = myHandler.handleNotFoundException(e);
-        //then
-        assertEquals("404", actual);
         mockMvc.perform(MockMvcRequestBuilders.get("/home/any"))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers.view().name("404"));
     }
 
     @Test
