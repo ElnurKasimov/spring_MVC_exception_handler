@@ -24,9 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        user=null;
         if(user == null)
-//                || user.getEmail() == null || user.getEmail().trim().isEmpty() || userRepository.getUserByEmail(user.getEmail()) != null)
             throw new NullEntityReferenceException("Cannot create empty user object");
         try{
             return userRepository.save(user);
@@ -47,11 +45,11 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         if(user == null)
             throw new NullEntityReferenceException("Cannot update empty user object");
-        User oldUser = readById(user.getId());
         try{
-        return userRepository.save(user);
-         } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            User oldUser = readById(user.getId());
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

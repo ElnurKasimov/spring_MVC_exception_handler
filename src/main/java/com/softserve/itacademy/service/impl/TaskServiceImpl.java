@@ -5,7 +5,9 @@ import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.Task;
 import com.softserve.itacademy.repository.TaskRepository;
 import com.softserve.itacademy.service.TaskService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -22,9 +24,13 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task create(Task user) {
-        if(user == null || user.getName() == null || user.getName().trim().isEmpty())
+        if(user == null)
             throw new NullEntityReferenceException("Cannot create empty task object");
-        return taskRepository.save(user);
+        try {
+            return taskRepository.save(user);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -39,14 +45,22 @@ public class TaskServiceImpl implements TaskService {
     public Task update(Task task) {
         if(task == null)
             throw new NullEntityReferenceException("Cannot create empty task object");
-        Task oldTask = readById(task.getId());
-        return taskRepository.save(task);
+        try {
+            Task oldTask = readById(task.getId());
+            return taskRepository.save(task);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public void delete(long id) {
-        Task task = readById(id);
-        taskRepository.delete(task);
+        try {
+            Task task = readById(id);
+            taskRepository.delete(task);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override

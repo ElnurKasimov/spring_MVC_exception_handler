@@ -5,7 +5,9 @@ import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.Role;
 import com.softserve.itacademy.repository.RoleRepository;
 import com.softserve.itacademy.service.RoleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -23,9 +25,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role create(Role role) {
-        if(role == null || role.getName() == null || role.getName().trim().isEmpty())
+        if(role == null)
             throw new NullEntityReferenceException("Cannot create empty state object");
-        return roleRepository.save(role);
+        try {
+            return roleRepository.save(role);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -40,14 +46,22 @@ public class RoleServiceImpl implements RoleService {
     public Role update(Role role) {
         if(role == null)
             throw new NullEntityReferenceException("Cannot update empty state object");
-        Role oldRole = readById(role.getId());
-        return roleRepository.save(role);
+        try {
+            Role oldRole = readById(role.getId());
+            return roleRepository.save(role);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public void delete(long id) {
-        Role role = readById(id);
+        try {
+            Role role = readById(id);
             roleRepository.delete(role);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override

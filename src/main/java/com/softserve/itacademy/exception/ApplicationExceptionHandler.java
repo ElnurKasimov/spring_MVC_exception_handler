@@ -39,15 +39,29 @@ public class ApplicationExceptionHandler {
     public ModelAndView handleNullEntityReferenceException(HttpServletRequest request, NullEntityReferenceException e) {
         return getModelAndView(request, HttpStatus.BAD_REQUEST, e);
     }
-//
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ModelAndView handleOtherExceptions(HttpServletRequest request, Exception e) {
-//        return getModelAndView(request, HttpStatus.INTERNAL_SERVER_ERROR, e);
-//    }
-//
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ModelAndView handleOtherExceptions(HttpServletRequest request, Exception e) {
+        return getModelAndView(request, HttpStatus.INTERNAL_SERVER_ERROR, e);
+    }
+
     private ModelAndView getModelAndView(HttpServletRequest request, HttpStatus httpStatus, Exception e) {
-        ModelAndView modelAndView = new ModelAndView("error");
+        ModelAndView modelAndView = new ModelAndView();
+        switch(httpStatus) {
+            case BAD_REQUEST:
+                modelAndView.setViewName("error");
+                break;
+            case NOT_FOUND:
+                modelAndView.setViewName("404");
+                break;
+            case INTERNAL_SERVER_ERROR:
+                modelAndView.setViewName("500");
+                break;
+            default:
+                modelAndView.setViewName("unknown-error");
+                break;
+        }
         modelAndView.addObject("title", "Error");
         modelAndView.addObject("message", e.getMessage());
         modelAndView.addObject("localDateTime", LocalDateTime.now());
