@@ -62,11 +62,21 @@ public class ApplicationExceptionHandler {
                 modelAndView.setViewName("unknown-error");
                 break;
         }
-        modelAndView.addObject("title", "Error");
+        modelAndView.addObject("title", httpStatus.getReasonPhrase() );
         modelAndView.addObject("message", e.getMessage());
         modelAndView.addObject("localDateTime", LocalDateTime.now());
-        modelAndView.addObject("status", httpStatus.value() + " / " + httpStatus.getReasonPhrase() );
+        modelAndView.addObject("status", httpStatus.value());
         modelAndView.addObject("type", e.getClass().getName());
+        String debugPropertyValue = System.getProperty("debug");
+        String debugEnvValue = System.getenv("DEBUG");
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        if( (debugPropertyValue != null && debugPropertyValue.equals("true")) ||
+                (debugEnvValue != null && debugEnvValue.equals("true")) ) {
+            modelAndView.addObject("stackTrace", stackTrace);
+        }
         return modelAndView;
     }
 

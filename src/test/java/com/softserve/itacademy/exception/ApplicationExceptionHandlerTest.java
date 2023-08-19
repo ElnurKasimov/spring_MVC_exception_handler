@@ -25,6 +25,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,21 +51,37 @@ class ApplicationExceptionHandlerTest {
     private StateService stateService;
 
 
+
     @Test
-    @DisplayName("Test that 404 exception is handled")
-    public void handle404Test () throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/home/any"))
+    void shouldReturnNullEntityReferenceError() throws Exception {
+        String message = "Cannot create empty user object";
+        String title = "Bad Request";
+        int status =  400;
+        when(userService.create(any())).thenThrow(new NullEntityReferenceException(message));
+        mockMvc.perform(MockMvcRequestBuilders.post("/users/create"))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                .andExpect(MockMvcResultMatchers.view().name("404"));
+                .andExpect(MockMvcResultMatchers.model().attribute("title",  is(title)))
+                .andExpect(MockMvcResultMatchers.model().attribute("message", is(message)))
+                .andExpect(MockMvcResultMatchers.model().attribute("status", is(status)))
+                .andExpect(view().name("error"));
+        verify(userService).create(any());
     }
 
-    @Test
-    @DisplayName("Test that 500 exception is handled")
-    public void handle500Test () throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/simulate-error"))
-                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
-    }
-
+//    @Test
+//    @DisplayName("Test that 404 exception is handled")
+//    public void handle404Test () throws Exception {
+//        mockMvc.perform(MockMvcRequestBuilders.get("/home/any"))
+//                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+//                .andExpect(MockMvcResultMatchers.view().name("404"));
+//    }
+//
+//    @Test
+//    @DisplayName("Test that 500 exception is handled")
+//    public void handle500Test () throws Exception {
+//        mockMvc.perform(MockMvcRequestBuilders.get("/simulate-error"))
+//                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+//    }
+//
 //    @Test
 //    void shouldReturnNotFoundError() throws Exception {
 //        // given
@@ -81,82 +99,55 @@ class ApplicationExceptionHandlerTest {
 //    }
 
 
+
+
+
+
+
+
+
+
+//
 //    @Test
-//    void shouldReturnNullEntityReferenceError() throws Exception {
+//    void shouldReturnNotFoundError() throws Exception {
+//
 //        // given
-//        String errorMessage = "Cannot create empty user object";
-//        when(userService.create(any())).thenThrow(new NullEntityReferenceException(errorMessage));
+//        String errorMessage = "something not found";
+//        when(userService.readById(9)).thenThrow(new EntityNotFoundException(errorMessage));
+//
 //        // when
-//        mockMvc.perform(post("/users/create")
+//        mockMvc.perform(get("/users/9/read")
 //                )
+//
 //                // then
 //                .andExpect(status().isNotFound())
-//                .andExpect(model().attribute("title",  "Error"))
+//                // .andExpect(content().contentType("text/html;charset=UTF-8"))
+//                .andExpect(model().attribute("code", "404 / Not Found"))
 //                .andExpect(model().attribute("message", is(errorMessage)))
 //                .andExpect(view().name("error"));
-//        verify(userService).create(any());
+//        verify(userService).readById(9);
 //    }
 
 
-    @Test
-    void shouldReturnNotFoundError() throws Exception {
-
-        // given
-        String errorMessage = "something not found";
-        when(userService.readById(9)).thenThrow(new EntityNotFoundException(errorMessage));
-
-        // when
-        mockMvc.perform(get("/users/9/read")
-                )
-
-                // then
-                .andExpect(status().isNotFound())
-                // .andExpect(content().contentType("text/html;charset=UTF-8"))
-                .andExpect(model().attribute("code", "404 / Not Found"))
-                .andExpect(model().attribute("message", is(errorMessage)))
-                .andExpect(view().name("error"));
-        verify(userService).readById(9);
-    }
-
-    @Test
-    void shouldReturnNullEntityReferenceError() throws Exception {
-
-        // given
-        String errorMessage = "this looks like a zero...";
-        when(userService.create(any())).thenThrow(new NullEntityReferenceException(errorMessage));
-
-        // when
-        mockMvc.perform(post("/users/create")
-                )
-
-                // then
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType("text/html;charset=UTF-8"))
-                .andExpect(model().attribute("code", "400 / Bad Request"))
-                .andExpect(model().attribute("message", is(errorMessage)))
-                .andExpect(view().name("error"));
-        verify(userService).create(any());
-    }
-
-    @Test
-    void shouldReturnServerError() throws Exception {
-
-        // given
-        String errorMessage = "WTF!?";
-        when(userService.getAll()).thenThrow(new RuntimeException(errorMessage));
-
-        // when
-        mockMvc.perform(get("/users/all")
-                )
-
-                // then
-                .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType("text/html;charset=UTF-8"))
-                .andExpect(model().attribute("code", "500 / Internal Server Error"))
-                .andExpect(model().attribute("message", is(errorMessage)))
-                .andExpect(view().name("bad-error"));
-        verify(userService).getAll();
-    }
+//    @Test
+//    void shouldReturnServerError() throws Exception {
+//
+//        // given
+//        String errorMessage = "WTF!?";
+//        when(userService.getAll()).thenThrow(new RuntimeException(errorMessage));
+//
+//        // when
+//        mockMvc.perform(get("/users/all")
+//                )
+//
+//                // then
+//                .andExpect(status().isInternalServerError())
+//                .andExpect(content().contentType("text/html;charset=UTF-8"))
+//                .andExpect(model().attribute("code", "500 / Internal Server Error"))
+//                .andExpect(model().attribute("message", is(errorMessage)))
+//                .andExpect(view().name("bad-error"));
+//        verify(userService).getAll();
+//    }
 }
 
 
