@@ -24,9 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        user=null;
         if(user == null)
-//                || user.getEmail() == null || user.getEmail().trim().isEmpty() || userRepository.getUserByEmail(user.getEmail()) != null)
             throw new NullEntityReferenceException("Cannot create empty user object");
         try{
             return userRepository.save(user);

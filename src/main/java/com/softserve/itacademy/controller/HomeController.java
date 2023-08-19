@@ -1,5 +1,6 @@
 package com.softserve.itacademy.controller;
 
+import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.service.RoleService;
 import com.softserve.itacademy.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,14 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/simulate-error")
-    public void simulateError() {
+    @GetMapping("/sise")
+    public void simulateInternalServerError() {
         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Simulated server error");
     }
+
+    @GetMapping("/snere")
+    public void simulateNullEntityReferenceException() {
+        throw new NullEntityReferenceException("Simulated create empty user object");
+    }
+
 }
