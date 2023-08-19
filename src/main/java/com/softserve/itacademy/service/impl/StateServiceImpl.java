@@ -5,7 +5,9 @@ import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.State;
 import com.softserve.itacademy.repository.StateRepository;
 import com.softserve.itacademy.service.StateService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
@@ -22,9 +24,13 @@ public class StateServiceImpl implements StateService {
 
     @Override
     public State create(State state) {
-        if(state == null || state.getName() == null || state.getName().trim().isEmpty())
+        if(state == null)
             throw new NullEntityReferenceException("Cannot create empty state object");
-        return stateRepository.save(state);
+        try {
+            return stateRepository.save(state);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -39,14 +45,22 @@ public class StateServiceImpl implements StateService {
     public State update(State state) {
         if(state == null)
             throw new NullEntityReferenceException("Cannot create empty state object");
-        State oldState = readById(state.getId());
-        return stateRepository.save(state);
+        try {
+            State oldState = readById(state.getId());
+            return stateRepository.save(state);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
     public void delete(long id) {
-        State state = readById(id);
+        try {
+            State state = readById(id);
             stateRepository.delete(state);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
