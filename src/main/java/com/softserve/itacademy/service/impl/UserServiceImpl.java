@@ -1,6 +1,5 @@
 package com.softserve.itacademy.service.impl;
 
-import com.softserve.itacademy.exception.EntityNotFoundException;
 import com.softserve.itacademy.exception.NullEntityReferenceException;
 import com.softserve.itacademy.model.User;
 import com.softserve.itacademy.repository.UserRepository;
@@ -9,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
+        user=null;
         if(user == null)
 //                || user.getEmail() == null || user.getEmail().trim().isEmpty() || userRepository.getUserByEmail(user.getEmail()) != null)
             throw new NullEntityReferenceException("Cannot create empty user object");
@@ -57,9 +58,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(long id) {
         Optional<User> optional = userRepository.findById(id);
-        if(optional.isEmpty())
+        if (optional.isEmpty())
             throw new EntityNotFoundException("User with id: " + id + " does not exist");
+        try {
             userRepository.delete(optional.get());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
