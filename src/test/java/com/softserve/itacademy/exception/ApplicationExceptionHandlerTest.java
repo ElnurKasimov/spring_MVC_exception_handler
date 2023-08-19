@@ -53,6 +53,7 @@ class ApplicationExceptionHandlerTest {
 
 
     @Test
+    @DisplayName("Test that handler for null entity errors works properly")
     void shouldReturnNullEntityReferenceError() throws Exception {
         String message = "Cannot create empty user object";
         String title = "Bad Request";

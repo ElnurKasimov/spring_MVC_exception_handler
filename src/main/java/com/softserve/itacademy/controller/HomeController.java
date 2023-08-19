@@ -31,5 +31,4 @@ public class HomeController {
     public void simulateNullEntityReferenceException() {
         throw new NullEntityReferenceException("Simulated create empty user object");
     }
-
 }

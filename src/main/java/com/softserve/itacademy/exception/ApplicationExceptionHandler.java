@@ -1,5 +1,7 @@
 package com.softserve.itacademy.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,7 +13,6 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
@@ -20,13 +21,9 @@ import java.time.LocalDateTime;
 public class ApplicationExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseStatus(value= HttpStatus.NOT_FOUND)
-    public ModelAndView handleNoHandlerFoundException (HttpServletRequest request, NoHandlerFoundException  e, ModelAndView modelAndView) {
-        modelAndView = new ModelAndView("404");
-        modelAndView.setStatus(HttpStatus.NOT_FOUND);
-        return modelAndView;
+    public ModelAndView handleError404(HttpServletRequest request, Exception e) {
+        return getModelAndView(request, HttpStatus.NOT_FOUND, e);
     }
-
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -46,7 +43,7 @@ public class ApplicationExceptionHandler {
         return getModelAndView(request, HttpStatus.INTERNAL_SERVER_ERROR, e);
     }
 
-    private ModelAndView getModelAndView(HttpServletRequest request, HttpStatus httpStatus, Exception e) {
+    public ModelAndView getModelAndView(HttpServletRequest request, HttpStatus httpStatus, Exception e) {
         ModelAndView modelAndView = new ModelAndView();
         switch(httpStatus) {
             case BAD_REQUEST:
